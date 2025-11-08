@@ -9,7 +9,7 @@ from basicsr.utils.options import dict2str, parse_options
 
 
 def test_pipeline(root_path):
-    # parse options, set distributed setting, set ramdom seed
+    # parse options, set distributed setting, set random seed
     opt, _ = parse_options(root_path, is_train=False)
 
     torch.backends.cudnn.benchmark = True
@@ -21,6 +21,12 @@ def test_pipeline(root_path):
     logger = get_root_logger(logger_name='basicsr', log_level=logging.INFO, log_file=log_file)
     logger.info(get_env_info())
     logger.info(dict2str(opt))
+
+    # ÖRNEK: .yml içindeki CESA parametrelerini logla (isteğe bağlı)
+    if 'network_g' in opt and isinstance(opt['network_g'], dict):
+        use_cesa = opt['network_g'].get('use_cesa', False)
+        fusion_type = opt['network_g'].get('fusion_type', 'sum')
+        logger.info(f"[GridFormer TEST] use_cesa={use_cesa}, fusion_type={fusion_type}")
 
     # create test dataset and dataloader
     test_loaders = []

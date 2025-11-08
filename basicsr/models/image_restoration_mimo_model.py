@@ -1,56 +1,64 @@
 from collections import OrderedDict
 from basicsr.utils.registry import MODEL_REGISTRY
-from .image_restoration_model import ImageCleanModel
+from basicsr.models.image_restoration_model import ImageCleanModel
 from basicsr.models import lr_scheduler as lr_scheduler
 import torch.nn.functional as F
-
+import torch
 
 @MODEL_REGISTRY.register()
 class MIMOModel(ImageCleanModel):
     """Base IR model for General Image Restoration."""
     
-    def optimize_parameters(self, current_iter):
+    def optimize_parameters(self, current_iter, scaler):
         self.optimizer_g.zero_grad()
-        self.output = self.net_g(self.lq)
+        # AMP: otomatik karışık hassasiyet modunda ileri geçiş
+        with torch.amp.autocast(device_type='cuda'):
+            preds = self.net_g(self.lq)
+            if not isinstance(preds, list):
+                preds = [preds]
+            self.output = preds[-1]
+            l_total = 0.
+            loss_dict = OrderedDict()
 
-        l_total = 0
-        loss_dict = OrderedDict()
+            # Multi-image ground truth oluşturma:
+            gt_images = [0 for _ in range(len(preds))]
+            gt_images[0] = self.gt
+            for i in range(1, len(preds)):
+                gt_images[i] = F.interpolate(gt_images[i - 1], scale_factor=0.5, mode='bilinear', recompute_scale_factor=True)
+            gt_images.reverse()
 
-        ######## produce multi-images as inputs
-        gt_images = [ 0 for _ in range(len(self.output))]
+            # Pixel loss
+            if self.cri_pix:
+                l_pix = 0.
+                for j in range(len(preds)):
+                    l_pix += self.cri_pix(preds[j], gt_images[j])
+                l_total += l_pix
+                loss_dict['l_pix'] = l_pix
 
-        gt_images[0] = self.gt
-        for i in range(1,len(self.output)):
-            gt_images[i] = F.interpolate(gt_images[i-1], scale_factor=0.5, mode='bilinear',recompute_scale_factor=True)
+            # Perceptual loss
+            if self.cri_perceptual:
+                l_percep = 0.
+                for i in range(len(preds)):
+                    l_percep1, _ = self.cri_perceptual(preds[i], gt_images[i])
+                    l_percep += l_percep1
+                l_total += l_percep
+                loss_dict['l_percep'] = l_percep
 
-        gt_images.reverse()
+            # Edge loss (varsa)
+            if self.cri_edge:
+                l_edge = 0.
+                for pred in preds:
+                    l_edge += self.cri_edge(pred, self.gt)
+                l_total += l_edge
+                loss_dict['l_edge'] = l_edge
 
-
-        # pixel loss
-        if self.cri_pix:
-            l_pix = 0.
-            for j in range(len(self.output)):
-                l_pix += self.cri_pix(self.output[j], gt_images[j])
-            l_total += l_pix
-            loss_dict['l_pix'] = l_pix
-
-        # perceptual loss
-        if self.cri_perceptual:
-            l_percep = 0.
-
-            for i in range(len(self.output)):
-                l_percep1, l_style1 = self.cri_perceptual(self.output[i], gt_images[i])
-                l_percep += l_percep1
-
-            l_total += l_percep
-            loss_dict['l_percep'] = l_percep
-
-        l_total.backward()
-        self.optimizer_g.step()
+        scaler.scale(l_total).backward()
+        scaler.step(self.optimizer_g)
+        scaler.update()
 
         self.log_dict = self.reduce_loss_dict(loss_dict)
 
         if self.ema_decay > 0:
             self.model_ema(decay=self.ema_decay)
 
-    
+print("MIMOModel başarıyla kaydedildi!")

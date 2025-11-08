@@ -1,28 +1,32 @@
-# general settings
-name: Raindrop_Removal_GridFormer_RainDrop
+# GridFormer_mixed.yml  (Validation Hızlandırması ile Güncellendi)
+
+# --------------------------------------------------
+# General settings
+# --------------------------------------------------
+name: CombinedWeather_GridFormer_Mixed_6850_mixed6868
 model_type: MIMOModel
 scale: 1
 num_gpu: 1
 manual_seed: 100
 
-# dataset and data loader settings
+# --------------------------------------------------
+# Dataset and data-loader settings
+# --------------------------------------------------
 datasets:
   train:
     name: TrainSet_Allweather
-    type: Dataset_PairedImage
-    dataroot_gt: datasets/Allweather/train/target
-    dataroot_lq: datasets/Allweather/train/input
+    type: PairedImageDataset
+    dataroot_gt: /content/drive/MyDrive/datasets/combined_weather/train/gt1
+    dataroot_lq: /content/drive/MyDrive/datasets/combined_weather/train/input1
     geometric_augs: true
     meta_info_file: ~
     filename_tmpl: '{}'
     io_backend:
       type: disk
-    io_memory: False
+    io_memory: false
     gt_size: 128
     use_hflip: true
     use_rot: true
-
-    # data loader
     use_shuffle: true
     num_worker_per_gpu: 8
     batch_size_per_gpu: 12
@@ -30,65 +34,75 @@ datasets:
     prefetch_mode: ~
 
   val:
-    name: ValSet_test_mix
-    type: Dataset_PairedImage
-    dataroot_gt: datasets/Allweather/test_mix/target
-    dataroot_lq: datasets/Allweather/test_mix/input
+    name: ValSet_Allweather
+    type: PairedImageDataset
+    dataroot_gt: /content/drive/MyDrive/datasets/combined_weather/train/gt1
+    dataroot_lq: /content/drive/MyDrive/datasets/combined_weather/train/input1
+    filename_tmpl: '{}'
     io_backend:
       type: disk
-    io_memory: False
+    io_memory: false
 
-# network structures
+# --------------------------------------------------
+# Network structure
+# --------------------------------------------------
 network_g:
   type: GridFormer
   in_channels: 3
   out_channels: 3
-  dim: 48
+  dim: 64
   kernel_size: 3
   stride: 2
   height: 3
   width: 6
-  num_blocks: [1,2,4]
-  heads: [2,4,8]
-  attention: True
+  num_blocks: [1, 2, 4]
+  heads: [2, 4, 8]
+  attention: true
   windows: 4
   sample_rate_trunk: [4,2,2]
   scale: 1
-# path
+  use_innovative_attn: true
+  scales: [1, 2, 4]
+  downsample_factor: 2
+  drop_path_prob: 0.0
+
+# --------------------------------------------------
+# Paths
+# --------------------------------------------------
 path:
   pretrain_network_g: ~
   strict_load_g: true
   resume_state: ~
 
-# training settings
+# --------------------------------------------------
+# Training settings
+# --------------------------------------------------
 train:
   ema_decay: 0.999
+  accumulation_steps: 4
   optim_g:
     type: AdamW
-    lr: !!float 3e-4
-    weight_decay: !!float 1e-4
-    betas: [ 0.9, 0.999 ]
-
+    lr: 1e-4
+    weight_decay: 1e-2
+    betas: [0.9, 0.999]
 
   scheduler:
     type: TrueCosineAnnealingLR
-    T_max: 1200000
-    eta_min: !!float 1e-6
+    T_max: 6400
+    eta_min: 1e-6
 
+  total_iter: 6400
+  warmup_iter: 400
 
-  total_iter: 1200000
-  warmup_iter: -1  # no warm up
-
-  # losses
   pixel_opt:
     type: CharbonnierLoss
     loss_weight: 1.0
     reduction: mean
-  
+
   perceptual_opt:
     type: PerceptualLoss
     layer_weights:
-      'conv5_4': 1  # before relu
+      conv5_4: 1
     vgg_type: vgg19
     use_input_norm: true
     range_norm: false
@@ -96,34 +110,42 @@ train:
     style_weight: 0
     criterion: l1
 
-# validation settings
+# --------------------------------------------------
+# Validation settings
+# --------------------------------------------------
 val:
-  val_freq: !!float 4000
-  save_img: false
-
+  val_freq: 4000
+  save_img: true
+  # <─ DEĞİŞİKLİK: Daha büyük tile'lar ve daha küçük örtüşme ile validasyon hızlandırıldı.
+  tile_size: 192
+  tile_overlap: 24
+  use_tta: false
   metrics:
     psnr:
       type: calculate_psnr
       crop_border: 0
-      test_y_channel: True
-      better: higher  # the higher, the better. Default: higher
+      test_y_channel: true
+      better: higher
     ssim:
       type: calculate_ssim
       crop_border: 0
-      test_y_channel: True
-      better: higher  # the higher, the better. Default: higher
+      test_y_channel: true
+      better: higher
 
-
-# logging settings
+# --------------------------------------------------
+# Logging
+# --------------------------------------------------
 logger:
   print_freq: 100
-  save_checkpoint_freq: !!float 4000
+  save_checkpoint_freq: 4000
   use_tb_logger: true
   wandb:
     project: ~
     resume_id: ~
 
-# dist training settings
+# --------------------------------------------------
+# Distributed training
+# --------------------------------------------------
 dist_params:
   backend: nccl
   port: 29500
