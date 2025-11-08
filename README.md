@@ -1,151 +1,111 @@
+# GridFormer-TR: Multi-Scale Cross-Attention for Multi-Weather Restoration
 
+GridFormer-TR is my customization of the original [GridFormer](https://github.com/TaoWangzj/GridFormer) backbone for restoring images captured under rain, snow, haze, or hybrid degradations. This fork keeps the grid-based residual dense transformer idea but introduces cross-scale attention, additional perceptual losses, and updated training utilities tailored to my mixed-weather experiments.
 
-
-# GridFormer: Residual Dense Transformer with Grid Structure for Image Restoration in Adverse Weather Conditions (IJCV 2024)
-
-[Tao Wang](https://scholar.google.com/citations?user=TsDufoMAAAAJ&hl=en), [Kaihao Zhang](https://scholar.google.com/citations?user=eqwDXdMAAAAJ&hl=en), [Ziqin Shao](), [Wenhan Luo](https://scholar.google.com/citations?user=g20Q12MAAAAJ&hl=en), [Bjorn Stenger](https://scholar.google.com/citations?user=plhjgHUAAAAJ&hl=en), [Tong Lu](https://cs.nju.edu.cn/lutong/index.htm),
-[Tae-Kyun Kim](https://scholar.google.com.hk/citations?user=j2WcLecAAAAJ&hl=zh-CN),
-[Wei Liu](https://scholar.google.com/citations?user=AjxoEpIAAAAJ&hl=en),
-[Hongdong Li](https://scholar.google.com.hk/citations?user=Mq89JAcAAAAJ&hl=zh-CN)
-
-
-[![paper](https://img.shields.io/badge/arXiv-Paper-<COLOR>.svg)](https://arxiv.org/pdf/2305.17863)
-
-
-
-
-
-#### News
-- **Jun 24, 2024:** Pre-trained models are released!
-- **Jun 24, 2024:** Codes is released!
-
-This repository contains the dataset, code and pre-trained models for our paper.
-
-<hr />
-
-> **Abstract:** *Image restoration in adverse weather conditions is a difficult task in computer vision. In this paper, we propose a novel transformer-based framework called GridFormer which serves as a backbone for image restoration under adverse weather conditions. GridFormer is designed in a grid structure using a residual dense transformer block, and it introduces two core designs. First, it uses an enhanced attention mechanism in the transformer layer. The mechanism includes stages of the sampler and compact self-attention to improve efficiency, and a local enhancement stage to strengthen local information. Second, we introduce a residual dense transformer block (RDTB) as the final GridFormer layer. This design further improves the network’s ability to learn effective features from both preceding and current local features. The GridFormer framework achieves state-of-the-art results on five diverse image restoration tasks in adverse weather conditions, including image deraining, dehazing, deraining & dehazing, desnowing, and multi-weather restoration.* 
-<hr />
-
-## Network Architecture
-![](images/GridFormer.png)
-
-### Datasets
-
-| Task | Dataset| Links |
-|:----|:----|:----|
-|Image Dehazing| ITS |  [Baidu cloud plate](https://pan.baidu.com/s/1MDeL3O8qfDuBp3ItOsGlbA?pwd=65h2)|
-|Image Dehazing| SOTS-indoor |  [Baidu cloud plate](https://pan.baidu.com/s/1Ezik5nUv4TwbIs2NTWutgg?pwd=yx6c)|
-|GridFormer-Haze4K|Haze4K|[Baidu cloud plate](https://pan.baidu.com/s/1dfBsL76stv5PWgJD864YLw?pwd=683z)|
-|GridFormer-Snow100K|Snow100k| [Baidu cloud plate](https://pan.baidu.com/s/1qLQViQAhlIaD5EqhHPNRqg?pwd=m2vf)|
-|GridFormer-RainDrop|RainDrop|[Baidu cloud plate](https://pan.baidu.com/s/1cmQdSO-l0VmJ_Rueybk0UQ?pwd=fe86)|
-|GridFormer-Outdoor-Rain|Outdoor-Rain| [Baidu cloud plate](https://pan.baidu.com/s/1VE4e7C1M4nFnqaqZp_4ayg?pwd=5gb7)|
-|GridFormer-Multi-weather-Restoration|Mix|[Baidu cloud plate](https://pan.baidu.com/s/1CpfxSyRo3dJVQG81EpENHQ?pwd=1jua)|
-
-
-### Pre-trained Models
-| Name | Dataset| Pre-trained models | Configs |
-|:----|:----|:----|-----|
-|GridFormer-SOTS-Indoor|SOTS-Indoor|[gdrive](https://drive.google.com/drive/folders/18OnOUkwfbpltn_i384z62m0cwrnHsnHL?usp=sharing)  \|  [Baidu cloud plate](https://pan.baidu.com/s/1-kCOBnsIbBJMFdpCfiUYvA?pwd=5bls)|[train](./options/train/GridFormer/Dehazing/SOTS-Indoor/GridFormer_SOTS-Indoor.yml) \| [test](./options/test/GridFormer/Dehazing/SOTS-Indoor/GridFormer_SOTS-Indoor.yml)|
-|GridFormer-Haze4K|Haze4K|[gdrive](https://drive.google.com/drive/folders/1TPDn9_5Lww7OWKf_zq0s1OpIRjfWm5mS?usp=sharing)  \|  [Baidu cloud plate](https://pan.baidu.com/s/1xJ8dG3xeaXSWvJhIjCReDQ?pwd=xet5)|[train](./options/train/GridFormer/Dehazing/Haze4K/GridFormer_Haze4K.yml) \| [test](./options/test/GridFormer/Dehazing/Haze4K/GridFormer_Haze4K.yml)|
-|GridFormer-Snow100K|Snow100k|[gdrive](https://drive.google.com/drive/folders/18EANFEjoerJsOaVpCIeMxiJ29P3CFODi?usp=sharing)  \|  [Baidu cloud plate](https://pan.baidu.com/s/1hSuBWnfgZAtDibt5TJDkvg?pwd=pgxy )|[train](./options/train/GridFormer/Desnowing/GridFormer_Snow100K.yml) \| [test](./options/test/GridFormer/Desonwing/GridFormer_Snow100K.yml)|
-|GridFormer-RainDrop|RainDrop|[gdrive](https://drive.google.com/drive/folders/1nRLw354icekUQRFRpVidVrrVeHAxLpzI?usp=sharing)  \|  [Baidu cloud plate](https://pan.baidu.com/s/1HaJV-utd5D3xrV8XYX5khA?pwd=7d1w)|[train](./options/train/GridFormer/Raindrop_Removal/GridFormer_RainDrop.yml) \| [test](./options/test/GridFormer/Raindrop_Removal/GridFormer_RainDrop.yml)|
-|GridFormer-Outdoor-Rain|Outdoor-Rain|[gdrive](https://drive.google.com/drive/folders/14XEcTU_dAawCZglHLVjF4yFdbGuLbc4z?usp=sharing)  \|  [Baidu cloud plate](https://pan.baidu.com/s/1oBr8DrKlNrLOzRJHdKS05w?pwd=lszg)|[train](./options/train/GridFormer/Dehazing&Deraining/GridFormer_Outdoor-Rain.yml) \| [test](./options/test/GridFormer/Dehazing&Deraining/GridFormer_Outdoor-Rain.yml)|
-|GridFormer-Multi-Weather|Mix|[gdrive](https://drive.google.com/drive/folders/1jLHWQwzUMb6rOmZ4S0vnIBnxfmh7sf4Z?usp=sharing)  \|  [Baidu cloud plate](https://pan.baidu.com/s/1T0lc2LFc-OJCkFFms5h3Tg?pwd=xjr3)|[train](./options/train/GridFormer/Multi_weather_Restoration/GridFormer_mixed.yml) \| [test](./options/test/GridFormer/Multi_weather_Restoration/GridFormer_mixed.yml)|
-
-
-## Results
-Experiments are performed for image restoration in adverser weather cnditions tasks including, image dehazing, image desnowing, Raindrop removal, image deraining & image dehazing, and multi-weather restoration. 
-
-<details>
-<summary><strong>Image Dehazing</strong> (click to expand) </summary>
-
-<p align="center"><img src = "images/table_dehazing.png"> </p>
-</details>
-
-<details>
-<summary><strong>Image Desnowing</strong> (click to expand) </summary>
-
-<p align="center"><img src = "images/table_desnowing.png"></p></details>
-
-<details>
-<summary><strong>Raindrop Removal</strong> (click to expand) </summary>
-
-
-<img src = "images/table_raindrop_removal.png"> 
-</details>
-
-
-<details>
-<summary><strong>Image Deraining & image Dehazing</strong> (click to expand) </summary>
-
-<img src = "images/table_deraining&dehazing.png">
-</details>
-
-## Get Started
-### Dependencies and Installation
-1. Create Conda Environment 
-```
-conda create -n GridFormer python=3.7
-conda activate GridFormer
-conda install pytorch=1.8 torchvision cudatoolkit=10.2 -c pytorch
-pip install matplotlib scikit-learn scikit-image opencv-python yacs joblib natsort h5py tqdm
-pip install einops gdown addict future lmdb numpy pyyaml requests scipy tb-nightly yapf lpips
-```
-2. Clone Repo
-```
-git clone https://github.com/TaoWangzj/GridFormer.git
-```
-
-3. Install basicsr
-
-```
-cd GridFormer
-python setup.py develop 
-```
-
-
-## Train (we use the dehazing for an example)
-
-1. To download training and testing data
-
-
-3. To train GridFormer, run
-```
-cd GridFormer
-./train.sh options/train/GridFormer/Dehazing/SOTS-Indoor/GridFormer_SOTS-Indoor.yml
-```
-**Note:** The above training script uses 8 GPUs by default. To use any other number of GPUs, modify [GridFormer/train.sh](./train.sh) and [GridFormer_SOTS-Indoor.yml](./options/train/GridFormer/Dehazing/SOTS-Indoor/GridFormer_SOTS-Indoor.yml)
-
-
-## Test
-
-1. Download the pre-trained [model](https://drive.google.com/drive/folders/18OnOUkwfbpltn_i384z62m0cwrnHsnHL?usp=sharing) and place it in `./checkpoints/`
-
-2. Testing
-```
-python basic/test.py -opt  options/test/GridFormer/Dehazing/SOTS-Indoor/GridFormer_SOTS-Indoor.yml
-```
-
-## Citation
-If you use GridFormer, please consider citing:
-
-    @article{wang2024gridformer,
-        title={Gridformer: Residual dense transformer with grid structure for image restoration in adverse weather conditions}, 
-        author={Gridformer: Residual dense transformer with grid structure for image restoration in adverse weather conditions},
-        journal={International Journal of Computer Vision},
-        pages={1--23},
-        year={2024}
-    }
-
-## Contact
-If you have any questions, please contact taowangzj@gamil.com
-
-**Acknowledgment:** This code is based on the [BasicSR](https://github.com/xinntao/BasicSR) toolbox and [Restormer](https://github.com/megvii-model/HINet). 
+> **Original work:** Wang et al. "GridFormer: Residual Dense Transformer with Grid Structure for Image Restoration in Adverse Weather Conditions", IJCV 2024.  
+> **This repo:** extends the published codebase with new attention blocks, loss modules, and training configs for the Turkish multi-weather dataset I curated (758 images).
 
 ---
-<details>
-<summary>statistics</summary>
 
-![visitors](https://visitor-badge.laobi.icu/badge?page_id=TaoWangzj/GridFormer)
+## Highlights
+- **Multi-scale cross-attention stack** (`InnovativeMultiScaleCrossAttention`) combines local self-attention, cross-scale attention, SE gates, and dynamic fusion with a learnable `cross_scale` factor.
+- **Stabilized transformer blocks** add LayerScale residual modulation, DropPath-based stochastic depth, and optional checkpointing inside TBM/RDTB modules.
+- **Expanded loss library** (DISTS, SSIM, MS-SSIM, HDR Charbonnier, Total Variation, Edge) with ready YAML hooks under `basicsr/losses/`.
+- **Experiment-ready config** for multi-weather restoration: `options/train/GridFormer/Multi_weather_Restoration/GridFormer_mixed.yml`.
+- **Integrated DISTS implementation** (PyTorch/TF/MATLAB) vendored under `DISTS/` to avoid extra submodules.
 
-</details>
+---
+
+## Architectural Differences vs. Original GridFormer
+| Area | Original Repo | GridFormer-TR |
+| --- | --- | --- |
+| Attention core | Compact Self-Attention (CSA) with sampler/local stages | LocalAttention plus CrossAttention per scale, fused via `DynamicFusion` and SE blocks |
+| Multi-scale context | Relying on grid routing only | Explicit `scales=(1,2,4)` branches with learnable `cross_scale` gain and bilinear alignment |
+| Transformer block | LayerNorm -> CSA -> FFN with basic residuals | LayerNorm + (LayerScale * DropPath * multi-scale attn) + LayerNorm + (LayerScale * DropPath * FFN) |
+| Dense modules | Fixed parameters, no stochastic depth | TBM/make_dense/RDTB accept `drop_path_prob`, `layer_scale_init_values`, `use_innovative_attn`, `scales`, `downsample_factor` |
+| Extract/Reconstruct heads | OverlapPatchEmbed + TBM | 3x3 conv + TBM with the same cross-attention stack and checkpoint-aware forward pass |
+| Losses | Charbonnier + perceptual | Adds DISTS, SSIM/MS-SSIM, TV, Edge, HDR Charbonnier; composite loss configurable from YAML |
+
+See `basicsr/archs/GridFormer_arch.py` for the implementation details.
+
+---
+
+## Custom Experiment Setup (758 Mixed-Weather Images)
+- **Dataset:** 758 aligned image pairs collected from my AllWeather-style experiments (rain, haze, and snow combinations).  
+- **Training schedule:** 100 epochs, 6,400 iterations (identical batch size and patch sampling for both models).  
+- **Config:** `options/train/GridFormer/Multi_weather_Restoration/GridFormer_mixed.yml` (AdamW, cosine learning rate, DISTS + SSIM + L1).  
+- **Hardware:** 2 x RTX 4090 with AMP.  
+- **Logging:** TensorBoard under `tb_logger/`, optional Weights & Biases runs under `wandb/` (ignored by Git).
+
+### Results (same dataset and schedule)
+| Model | Epochs | Iterations | PSNR (dB) | SSIM |
+| --- | --- | --- | --- | --- |
+| Original GridFormer (CSA attention) | 100 | 6,400 | 24.77 | 0.8549 |
+| **GridFormer-TR (multi-scale cross-attn)** | 100 | 6,363 (best ckpt) | **24.9423** | 0.8540 |
+
+- Training log excerpt (`2025-04-13 16:28:34`) shows `psnr: 24.9423` and `ssim: 0.8540` at iteration 6,363.  
+- GridFormer-TR improves PSNR by +0.17 dB while keeping SSIM comparable (-0.0009), and produces sharper rain structures in qualitative comparisons.
+
+---
+
+## Getting Started
+### Dependencies
+```bash
+conda create -n gridformer-tr python=3.11
+conda activate gridformer-tr
+pip install -r requirements.txt
+python setup.py develop  # installs BasicSR ops locally
+```
+
+### Repository
+```bash
+git clone https://github.com/lutfiozark/GridFormer-TR.git
+cd GridFormer-TR
+```
+
+### Dataset Preparation
+1. Place paired training data under `datasets/Allweather/{train,val}/` (or update the YAML paths).  
+2. Edit `options/train/GridFormer/Multi_weather_Restoration/GridFormer_mixed.yml` with absolute dataset paths.  
+3. Optionally download the public benchmarks listed in the original paper if you plan to reproduce IJCV numbers.
+
+### Training
+```bash
+./train.sh options/train/GridFormer/Multi_weather_Restoration/GridFormer_mixed.yml
+```
+- The script launches distributed training; adjust `train.sh` if you want a single GPU or different world size.
+
+### Evaluation
+```bash
+python basicsr/test.py -opt options/train/GridFormer/Multi_weather_Restoration/GridFormer_mixed.yml \
+                       --launcher none --save-result
+```
+- Switch `--launcher` to `pytorch` when evaluating in distributed mode.  
+- Validation outputs are written to `results/GridFormer_mixed/val_images/`.
+
+---
+
+## Additional Components
+- `DISTS/`: Vendored perceptual metric; `basicsr/losses/dists_loss.py` exposes `DISTSLoss`.  
+- `pretrained/`: place downloaded checkpoints here (directory ignored by Git).  
+- `experiments/`, `debug_outputs/`, `tb_logger/`, `wandb/`: runtime artifacts filtered via `.gitignore`.
+
+---
+
+## Citation and Acknowledgements
+- Please cite the original IJCV paper if you use this repository:
+
+```bibtex
+@article{wang2024gridformer,
+  title   = {GridFormer: Residual Dense Transformer with Grid Structure for Image Restoration in Adverse Weather Conditions},
+  author  = {Wang, Tao and Zhang, Kaihao and Shao, Ziqin and Luo, Wenhan and Stenger, Bjorn and Lu, Tong and Kim, Tae-Kyun and Liu, Wei and Li, Hongdong},
+  journal = {International Journal of Computer Vision},
+  year    = {2024}
+}
+```
+
+- GridFormer-TR builds on [BasicSR](https://github.com/XPixelGroup/BasicSR), [Restormer](https://github.com/swz30/Restormer), and the official GridFormer codebase.  
+- For questions or collaboration requests, please open an issue on GitHub.
+
+---
+
+Made with love for multi-weather restoration research in Turkey.
