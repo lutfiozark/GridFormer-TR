@@ -18,7 +18,16 @@ GridFormer-TR is my customization of the original [GridFormer](https://github.co
 
 ## Visual Overview
 ![GridFormer-TR pipeline: grid head, fusion module, and grid tail](images/mimari.png)
-- Full pipeline with three-level grid head, dynamic fusion, and scale-wise reconstruction for GridFormer-TR.
+- Full GridFormer-TR pipeline: three-level grid head, dynamic fusion, and scale-wise reconstruction.
+
+![IMCA: Local + Cross Attention branches with Dynamic Fusion](images/imca.png)
+- IMCA block: local attention plus k=2/k=8 cross-attention fused by dynamic fusion and a scale-fusion 1x1 conv.
+
+![Down/Up path with IMCA and dynamic fusion](images/grid.png)
+- Dikey bilgi akis: 3x3 conv + pixel unshuffle ile asagi, IMCA sonrasi yukari ornekleme ve lokal skip + Dynamic Fusion.
+
+![TBM/RDTB block with dynamic fusion arcs](images/rtdb.png)
+- TBM/RDTB ici dinamik fuzyon yaylari, yerel skip baglantilari ve 1x1 conv ile olcek fuzyonu.
 
 ---
 
